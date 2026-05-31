@@ -27,6 +27,9 @@ ENV NODE_ENV=production
 COPY Backend/package.json Backend/package-lock.json ./
 RUN npm install --omit=dev --no-audit --no-fund && npm cache clean --force
 
+COPY --from=backend-build /app/Backend/dist ./dist
+COPY --from=frontend-build /app/Frontend/dist ./public
+
 EXPOSE 3001
 USER node
 CMD ["node", "dist/index.js"]
