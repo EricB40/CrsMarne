@@ -5,7 +5,7 @@
 # A node image is a docker concept
 FROM node:22-bookworm-slim AS frontend-build
 # The we create the frontend folder
-WORKDIR /app/Frontend
+WORKDIR /app
 # copy all there
 COPY frontend/ ./Frontend
 
