@@ -21,7 +21,7 @@ RUN npm install --no-audit --no-fund \
 # --- Stage 2: compile the API (TypeScript → JavaScript) ---
 # Produces dist/ with index.js and the rest of the server bundle.
 FROM node:22-bookworm-slim AS backend-build
-WORKDIR /app/Backend
+WORKDIR /app
 COPY backend/ ./Backend
 
 RUN npm install --no-audit --no-fund \
@@ -30,7 +30,7 @@ RUN npm install --no-audit --no-fund \
 # --- Stage 3: runtime image (only prod deps + built assets) ---
 # Express serves API routes and static files from public/ (the Vite build from stage 1).
 FROM node:22-bookworm-slim AS runner
-WORKDIR /app/Backend
+WORKDIR /app
 ENV NODE_ENV=production
 
 COPY backend/package.json backend/package-lock.json ./
