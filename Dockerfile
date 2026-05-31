@@ -7,7 +7,8 @@ FROM node:22-bookworm-slim AS frontend-build
 # The we create the frontend folder
 WORKDIR /app/frontend
 # copy all there
-COPY frontend/ ./
+COPY frontend/ ./Frontend
+WORKDIR /app/frontend/Frontend
 # Empty = browser calls /api on the same host as the page (same domain as Express).
 ENV VITE_API_URL=
 # Public Clerk key (safe to pass as build-arg; it is embedded in client JS anyway)
