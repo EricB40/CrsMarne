@@ -5,7 +5,7 @@
     "lib": ["ES2022"],
 
     /* Node ESM */
-    "module": "ES2022",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "ignoreDeprecations": "6.0",
 
