@@ -21,7 +21,8 @@ RUN npm install --no-audit --no-fund \
 # Produces dist/ with index.js and the rest of the server bundle.
 FROM node:22-bookworm-slim AS backend-build
 WORKDIR /app
-COPY backend/ ./
+COPY backend/ ./Backend
+WORKDIR /app/Backend
 RUN npm install --no-audit --no-fund \
     && npm run build
 
