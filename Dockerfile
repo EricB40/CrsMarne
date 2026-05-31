@@ -5,10 +5,10 @@
 # A node image is a docker concept
 FROM node:22-bookworm-slim AS frontend-build
 # The we create the frontend folder
-WORKDIR /app/frontend
+WORKDIR /app/Frontend
 # copy all there
 COPY frontend/ ./Frontend
-WORKDIR /app/frontend/Frontend
+
 # Empty = browser calls /api on the same host as the page (same domain as Express).
 ENV VITE_API_URL=
 # Public Clerk key (safe to pass as build-arg; it is embedded in client JS anyway)
@@ -21,16 +21,16 @@ RUN npm install --no-audit --no-fund \
 # --- Stage 2: compile the API (TypeScript → JavaScript) ---
 # Produces dist/ with index.js and the rest of the server bundle.
 FROM node:22-bookworm-slim AS backend-build
-WORKDIR /app
-COPY backend/ ./Backend
 WORKDIR /app/Backend
+COPY backend/ ./Backend
+
 RUN npm install --no-audit --no-fund \
     && npm run build
 
 # --- Stage 3: runtime image (only prod deps + built assets) ---
 # Express serves API routes and static files from public/ (the Vite build from stage 1).
 FROM node:22-bookworm-slim AS runner
-WORKDIR /app
+WORKDIR /app/Backend
 ENV NODE_ENV=production
 
 COPY backend/package.json backend/package-lock.json ./
