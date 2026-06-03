@@ -4,6 +4,9 @@ import "dotenv/config";
 import { clerkMiddleware } from "@clerk/express"
 import {clerkWebhookHandler} from "./webhooks/clerk";
 import { getEnv } from "./lib/env";
+import  meRouter  from "./routes/meRouter";
+import  productsRouter  from "./routes/productsRouter";
+import streamRouter from "./routes/streamRouter";
 
 import fs from "node:fs";
 import path from "node:path";
@@ -23,6 +26,22 @@ app.post("/webhooks/clerk", rawJson, (req, res) => {
 app.use(rawJson);
 app.use(cors());
 app.use(clerkMiddleware());
+
+
+// to reachout the currently authenticated user in the frontend,
+// we can create a route that returns the user info, and we can call
+//  this route from the frontend to get the user info, and we can also
+//  use this route to test if the authentication is working properly
+/* we fetch this user from db as a record and sent it back to a client */
+/* idem for products, by this we can get products, catergories... */
+/* Also Stream (getstream.io) is the platform for building real-time chat and activity feeds
+a user having purchased items can have support, but stream must authenticate user from the server side which
+is different than clerk, for that we need a router */
+app.use("/api/me", meRouter);
+app.use("/api/products", productsRouter);
+app.use("/api/stream", streamRouter);
+
+
 // concerting our public directory and convert to a static asset directory, this is where we will store the uploaded
 //  files from the users, and serve them as static assets
 /* here after if request is not from API we can redirect to frontend and receive the response */
@@ -41,6 +60,7 @@ if (fs.existsSync(publicDir)) {
         res.sendFile(path.join(publicDir, "index.html"), (err) => next(err));
     });
 }
+// todo, we can also add a 404 handler here for any unmatched routes, and a global error handler to catch any errors that may occur in the route handlers and return a proper error response to the client.
 
 /* instead of hardcoding the port, we will create an env.ts file in the src/lib folder */
 app.listen(env.PORT, () => {

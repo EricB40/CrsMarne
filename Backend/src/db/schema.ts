@@ -13,7 +13,9 @@ export type CheckoutSessionLine = {
 
 // Here we define the users table schema using drizzle-orm's pgTable function
 // We just have to read the doc.
-// clerUserId is a string that references the Clerk user ID, which is a unique identifier for each user in the Clerk authentication system. This allows us to link our users in the database with their corresponding accounts in Clerk, enabling us to manage user
+// clerUserId is a string that references the Clerk user ID, which is a unique identifier for each user in the Clerk 
+// authentication system. This allows us to link our users in the database with their corresponding accounts in Clerk,
+//  enabling us to manage user
 //  authentication and authorization effectively.   
 export const users = pgTable('users', {
     id: uuid('id').primaryKey().defaultRandom(),
