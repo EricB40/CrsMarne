@@ -37,7 +37,7 @@ export const products = pgTable('products', {
     name: text('name').notNull(),
     category: text('category').notNull().default('general'),
     description: text('description').notNull().default(''),
-    priceCents: text('price_cents').notNull().default('0'),
+    priceCents: integer('price_cents').notNull().default(0),
     currency: text('currency').notNull().default('USD'),
     imageUrl: text('image_url'),
     imageKitFileId: text('image_kit_file_id'),

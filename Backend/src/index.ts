@@ -7,9 +7,11 @@ import { getEnv } from "./lib/env";
 import  meRouter  from "./routes/meRouter";
 import  productsRouter  from "./routes/productsRouter";
 import streamRouter from "./routes/streamRouter";
+import checkoutRouter from "./routes/checkoutRouter";
 
 import fs from "node:fs";
 import path from "node:path";
+
 
 const name: string = "Codesistency Backend";
 const env = getEnv();
@@ -22,6 +24,9 @@ the request to clerkWebhookHandler for processing.*/
 app.post("/webhooks/clerk", rawJson, (req, res) => {
     void clerkWebhookHandler(req, res);
 });
+// app.post("/webhooks/polar", rawJson, (req, res) => {
+//     void polarWebhookHandler(req, res);
+// });
 
 app.use(rawJson);
 app.use(cors());
@@ -40,6 +45,7 @@ is different than clerk, for that we need a router */
 app.use("/api/me", meRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/stream", streamRouter);
+app.use("/api/checkout", checkoutRouter);
 
 
 // concerting our public directory and convert to a static asset directory, this is where we will store the uploaded
