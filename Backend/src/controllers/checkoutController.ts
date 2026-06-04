@@ -5,11 +5,12 @@ import { getAuth } from "@clerk/express";
 import { getLocalUser } from "../lib/users";
 import { eq, and, inArray } from 'drizzle-orm';
 import { db } from '../db';
-import { CheckoutSessionLine, products } from '../db/schema';
+import { CheckoutSessionLine, checkoutSessions, products } from '../db/schema';
+import { polarCreateCheckout } from "../lib/polar";
 
 
 const env = getEnv();
-
+// we create a schema for zod validation
 const cartSchema = z.object({
     items: z.array(
         z.object({
@@ -18,7 +19,13 @@ const cartSchema = z.object({
         })
     ).min(1)
 });
-
+// we check some authentification and if the cart is valid
+// we got the polar access token
+// then we got the products and calculate the total price on the server side
+// then we create a checkout session in the db
+// then create some data like successUrl and returnUrl
+// then call our method polarCreateCheckout to send the Request to Polar
+// which permits to create the checkout page
 export async function createCheckout(req: Request, res: Response, next: NextFunction){
     try {
         const { userId, isAuthenticated } = getAuth(req);
@@ -67,8 +74,47 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
         if (totalCents < 10) {
             return res.status(400).json({ error: "Total below Polar minimum" });
         }
+        // when on the checkout page, we create a checkout session in 'pending' state
 
-        res.json({ message: "Checkout session created successfully" });
+        // Unless paid, there will be no order in the db
+        // Later we will use this session in the polare records
+        const inserted = await db
+        .insert(checkoutSessions)
+        .values({
+            userId: localUser.id,
+            lines: lines,
+            totalCents: totalCents,
+            currency: "EUR"
+        })
+        .returning();
+        const session = inserted[0];
+        if (!session) {
+            return res.status(500).json({ error: "Failed to create checkout session" });
+        }
+        // After we need 2 url: the one if the user hit the return on the checkout screen, will return to cart page
+        const returnUrl = `${env.FRONTEND_URL}/cart`;
+        // the one if the user complete the payment, will return to a success page
+        const successUrl = `${env.FRONTEND_URL}/checkout/return?checkout_id=${CHECKOUT_ID}`;
+        // Here you would typically create a checkout session with your payment provider (e.g., Stripe)
+        // and return the session ID or URL to the client.
+
+        const checkout = await polarCreateCheckout(env, {
+            products: [env.POLAR_CHECKOUT_PRODUCT_ID], // we will have one product in polar which is a generic product, and we will pass the actual products in the metadata
+            prices: {
+                [env.POLAR_CHECKOUT_PRODUCT_ID]: [{
+                        amount_type: "fixed",
+                        price_amount: totalCents,
+                        price_currency: "EUR"
+                }]
+            },
+            successUrl: successUrl,
+            return_url: returnUrl,
+            external_customer_id: userId,
+            metadata: { checkout_session_id: session.id }
+        });
+        await db.update(checkoutSessions).set({polarCheckoutId:checkout.id}).where(eq(checkoutSessions.id, session.id))
+
+        res.json({ checkoutUrl: checkout.url });
     } catch (error) {
         next(error);
     }
