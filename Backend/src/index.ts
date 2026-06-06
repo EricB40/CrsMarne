@@ -13,6 +13,9 @@ import checkoutRouter from "./routes/checkoutRouter";
 import fs from "node:fs";
 import path from "node:path";
 
+import * as Sentry from "@sentry/node";
+import { sentryClerkUserMiddleware } from "./middlewares/sentryClerkUser";
+
 
 
 const name: string = "Codesistency Backend";
@@ -33,6 +36,7 @@ app.post("/webhooks/polar", rawJson, (req, res) => {
 app.use(rawJson);
 app.use(cors());
 app.use(clerkMiddleware());
+app.use(sentryClerkUserMiddleware);
 
 
 // to reachout the currently authenticated user in the frontend,
@@ -69,7 +73,15 @@ if (fs.existsSync(publicDir)) {
     });
 }
 // todo, we can also add a 404 handler here for any unmatched routes, and a global error handler to catch any errors that may occur in the route handlers and return a proper error response to the client.
+Sentry.setupExpressErrorHandler(app)
+app.use((_err: unknown, _req: express.Request , res: express.Response , _next: express.NextFunction) => {
+    const sentryId = (res as express.Response & {sentry?: string}).sentry
 
+    res.status(500).json({
+        error: "Internal server error",
+        ...(sentryId !== undefined && {sentryId})
+    })
+});
 /* instead of hardcoding the port, we will create an env.ts file in the src/lib folder */
 app.listen(env.PORT, () => {
     console.log(`${name} is running on port ${env.PORT}`);
