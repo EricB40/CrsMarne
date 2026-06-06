@@ -94,7 +94,7 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
         // After we need 2 url: the one if the user hit the return on the checkout screen, will return to cart page
         const returnUrl = `${env.FRONTEND_URL}/cart`;
         // the one if the user complete the payment, will return to a success page
-        const successUrl = `${env.FRONTEND_URL}/checkout/return?checkout_id=${CHECKOUT_ID}`;
+        const successUrl = `${env.FRONTEND_URL}/checkout/return?checkout_id=${session.id}`;
         // Here you would typically create a checkout session with your payment provider (e.g., Stripe)
         // and return the session ID or URL to the client.
 

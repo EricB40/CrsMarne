@@ -3,6 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import { clerkMiddleware } from "@clerk/express"
 import {clerkWebhookHandler} from "./webhooks/clerk";
+import { polarWebhookHandler } from "./webhooks/polar";
 import { getEnv } from "./lib/env";
 import  meRouter  from "./routes/meRouter";
 import  productsRouter  from "./routes/productsRouter";
@@ -11,6 +12,7 @@ import checkoutRouter from "./routes/checkoutRouter";
 
 import fs from "node:fs";
 import path from "node:path";
+
 
 
 const name: string = "Codesistency Backend";
@@ -24,9 +26,9 @@ the request to clerkWebhookHandler for processing.*/
 app.post("/webhooks/clerk", rawJson, (req, res) => {
     void clerkWebhookHandler(req, res);
 });
-// app.post("/webhooks/polar", rawJson, (req, res) => {
-//     void polarWebhookHandler(req, res);
-// });
+app.post("/webhooks/polar", rawJson, (req, res) => {
+    void polarWebhookHandler(req, res);
+});
 
 app.use(rawJson);
 app.use(cors());
