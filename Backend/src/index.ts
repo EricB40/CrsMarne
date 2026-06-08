@@ -9,6 +9,8 @@ import  meRouter  from "./routes/meRouter";
 import  productsRouter  from "./routes/productsRouter";
 import streamRouter from "./routes/streamRouter";
 import checkoutRouter from "./routes/checkoutRouter";
+import adminRouter from "./routes/adminRouter"
+
 
 import fs from "node:fs";
 import path from "node:path";
@@ -52,6 +54,7 @@ app.use("/api/me", meRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/stream", streamRouter);
 app.use("/api/checkout", checkoutRouter);
+app.use('/api/admin', adminRouter);
 
 
 // concerting our public directory and convert to a static asset directory, this is where we will store the uploaded

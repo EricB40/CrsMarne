@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --import ./src/instrument.ts dist/index.js",
-    "dev": "tsx watch --import ./src/instrument.ts src/index.ts",
+    "dev": "tsx watch --import ./src/webhooks/instrument.ts src/index.ts",
     "build": "tsc",
     "db:push": "drizzle-kit push"
   },
