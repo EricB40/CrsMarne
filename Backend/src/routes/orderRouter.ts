@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { listOrders } from "../controllers/orderController";
+import { createStreamChannel, getOrder, listOrders } from "../controllers/orderController";
 
 const router = Router();
 
-router.get("/", listOrders)
+router.get("/", listOrders);
+router.get("/:id", getOrder);
+// Then for support chat:
+router.post("/:id/stream-channel", createStreamChannel);
 
 export default router;
