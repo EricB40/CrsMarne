@@ -12,6 +12,7 @@ function App() {
           <UserButton />
         </Show>
       </header>
+      <button className="btn btn-primary">BUTTON Trial</button>
     </>
   );
 }
